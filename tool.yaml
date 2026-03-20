@@ -1,0 +1,303 @@
+openapi: 3.0.3
+info:
+  title: Wafer Action Tools API
+  version: 1.0.0
+  description: >
+    Action tools for wafer incident handling in watsonx Orchestrate.
+
+servers:
+  - url: https://your-api.example.com
+    description: Replace with your real backend base URL
+
+tags:
+  - name: Case Management
+  - name: Ticketing
+  - name: Notification
+  - name: Reporting
+
+paths:
+  /cases:
+    post:
+      operationId: create_case_log
+      tags: [Case Management]
+      summary: Create case log
+      description: Create a traceable wafer incident case record.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCaseLogRequest'
+      responses:
+        '201':
+          description: Case created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateCaseLogResponse'
+
+  /tickets/engineering:
+    post:
+      operationId: create_engineering_ticket
+      tags: [Ticketing]
+      summary: Create engineering ticket
+      description: Open an engineering ticket for wafer defect investigation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEngineeringTicketRequest'
+      responses:
+        '201':
+          description: Engineering ticket created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateEngineeringTicketResponse'
+
+  /notifications/escalation:
+    post:
+      operationId: send_escalation_notification
+      tags: [Notification]
+      summary: Send escalation notification
+      description: Send an escalation notice to a team or owner group.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEscalationNotificationRequest'
+      responses:
+        '200':
+          description: Notification sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEscalationNotificationResponse'
+
+  /reports/root-cause/export:
+    post:
+      operationId: export_root_cause_analysis_report
+      tags: [Reporting]
+      summary: Export root cause analysis report
+      description: Generate and export an RCA report for a wafer incident.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportRcaReportRequest'
+      responses:
+        '200':
+          description: RCA report exported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportRcaReportResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CreateCaseLogRequest:
+      type: object
+      required:
+        - case_title
+        - wafer_id
+        - lot_id
+        - tool_id
+        - severity
+        - summary
+      properties:
+        case_title:
+          type: string
+          example: Edge-Ring defect on ETCH_07
+        wafer_id:
+          type: string
+          example: WAFER_0231
+        lot_id:
+          type: string
+          example: LOT_A1842
+        tool_id:
+          type: string
+          example: ETCH_07
+        process_step:
+          type: string
+          example: etch
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        predicted_defect:
+          type: string
+          enum: [Center, Donut, Edge-Loc, Edge-Ring, Loc, Random, Scratch, Near-full, None]
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          example: 0.93
+        summary:
+          type: string
+        evidence:
+          type: array
+          items:
+            type: string
+        suspected_causes:
+          type: array
+          items:
+            type: string
+        created_by:
+          type: string
+          example: Wafer Response Planner
+
+    CreateCaseLogResponse:
+      type: object
+      properties:
+        case_id:
+          type: string
+          example: CASE-2026-000123
+        status:
+          type: string
+          example: created
+        created_at:
+          type: string
+          format: date-time
+
+    CreateEngineeringTicketRequest:
+      type: object
+      required:
+        - title
+        - priority
+        - owner_group
+        - description
+      properties:
+        title:
+          type: string
+          example: Investigate recurring Edge-Ring pattern on ETCH_07
+        priority:
+          type: string
+          enum: [P4, P3, P2, P1]
+        owner_group:
+          type: string
+          example: process_engineering
+        description:
+          type: string
+        case_id:
+          type: string
+          example: CASE-2026-000123
+        recommended_actions:
+          type: array
+          items:
+            type: string
+        attachments:
+          type: array
+          items:
+            type: string
+            format: uri
+
+    CreateEngineeringTicketResponse:
+      type: object
+      properties:
+        ticket_id:
+          type: string
+          example: ENG-45678
+        ticket_url:
+          type: string
+          format: uri
+        status:
+          type: string
+          example: open
+
+    SendEscalationNotificationRequest:
+      type: object
+      required:
+        - recipient_group
+        - channel
+        - message
+      properties:
+        recipient_group:
+          type: string
+          example: shift_leads
+        channel:
+          type: string
+          enum: [email, slack, teams, sms]
+        subject:
+          type: string
+          example: High-severity wafer incident escalation
+        message:
+          type: string
+        priority:
+          type: string
+          enum: [low, normal, high, urgent]
+        case_id:
+          type: string
+          example: CASE-2026-000123
+
+    SendEscalationNotificationResponse:
+      type: object
+      properties:
+        notification_id:
+          type: string
+          example: NOTIF-98765
+        delivery_status:
+          type: string
+          example: sent
+
+    ExportRcaReportRequest:
+      type: object
+      required:
+        - case_id
+        - report_title
+        - format
+        - incident_summary
+      properties:
+        case_id:
+          type: string
+          example: CASE-2026-000123
+        report_title:
+          type: string
+          example: RCA Report - Edge-Ring on ETCH_07
+        format:
+          type: string
+          enum: [pdf, docx, html, json]
+        incident_summary:
+          type: string
+        diagnosis:
+          type: object
+          additionalProperties: true
+        suspected_causes:
+          type: array
+          items:
+            type: string
+        evidence:
+          type: array
+          items:
+            type: string
+        actions_taken:
+          type: array
+          items:
+            type: string
+        approval_status:
+          type: string
+          enum: [pending, approved, rejected, not_required]
+
+    ExportRcaReportResponse:
+      type: object
+      properties:
+        report_id:
+          type: string
+          example: RCA-2026-00456
+        file_name:
+          type: string
+          example: RCA_Report_CASE-2026-000123.pdf
+        download_url:
+          type: string
+          format: uri
+
+security:
+  - bearerAuth: []
