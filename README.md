@@ -52,6 +52,14 @@ pip install -r orchestrate/install_requirements.txt
 pip install torch torchvision pillow numpy scikit-learn pyyaml
 ```
 
+## IBM Watson Orchestrator Setup
+
+```
+orchestrate env activate myenv
+orchestrate tools import --kind python -f orchestrate/wafer_action_tools.py
+orchestrate tools import --kind flow -f orchestrate/wafer_response_flow.py
+```
+
 ## Frontend Setup
 
 Install frontend dependencies:
