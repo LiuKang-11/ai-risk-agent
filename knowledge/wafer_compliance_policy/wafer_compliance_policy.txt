@@ -1,0 +1,156 @@
+wafer_compliance_policy
+
+Source package for the Wafer Compliance Agent.
+
+========================================================================
+README
+========================================================================
+
+Attach this knowledge source to the Wafer Compliance Agent.
+
+Purpose:
+- determine whether candidate actions are allowed, restricted, or blocked
+- identify required approvals and human-review triggers
+- enforce traceability and audit expectations
+
+This package should not diagnose the wafer or choose detailed engineering causes.
+
+========================================================================
+APPROVAL MATRIX
+========================================================================
+
+No approval required
+- create case log
+- notify pre-approved operational distribution groups
+- request standard metrology review
+- recommend, but do not execute, engineering follow-up
+
+Supervisor or shift lead approval required
+- submit lot hold request
+- request urgent out-of-sequence metrology
+- open high-priority operational incident
+
+Process or equipment engineering approval required
+- request tool inspection that interrupts planned production
+- assign root-cause owner across organizations
+- approve non-standard containment actions
+
+Quality or manufacturing management approval required
+- cross-lot containment recommendations
+- policy exceptions
+- actions with significant delivery or customer impact
+
+Rule
+If multiple approval levels apply, enforce the highest level.
+
+========================================================================
+SEVERITY TO ACTION POLICY
+========================================================================
+
+Normal
+- allowed: monitor, log, and optionally request more evidence
+- restricted: no containment action
+- blocked: no hold-related request without new evidence
+
+Suspicious
+- allowed: create case log, notify responsible teams, request metrology review, request engineering attention
+- restricted: hold request requires approval path
+- blocked: autonomous production interruption
+
+Critical
+- allowed: immediate case log, high-priority notification, expedited review, hold request submission through workflow
+- restricted: tool interruption and lot containment must follow approval workflow
+- blocked: direct autonomous hold, release, recipe modification, or tool disablement
+
+Confidence modifier
+- low confidence lowers action aggressiveness
+- high confidence with corroborating evidence can justify stronger escalation inside policy limits
+
+========================================================================
+LOT HOLD POLICY
+========================================================================
+
+Policy intent
+Agents may recommend or request a lot hold, but must not directly place or release a hold unless a separate approved system role explicitly allows it.
+
+Hold request triggers
+- critical contamination risk
+- repeated severe defect across wafers in the same lot
+- likely mechanical damage affecting multiple wafers
+- major metrology excursion with unresolved disposition
+
+Hold request contents
+- lot identifier
+- evidence summary
+- suspected defect and severity
+- why containment is recommended
+- required approver
+
+Release rule
+- agent must never release a hold autonomously
+- release requires human disposition and traceable justification
+
+========================================================================
+NOTIFICATION RULES
+========================================================================
+
+Normal
+- optional notification to monitoring channel only
+
+Suspicious
+- notify shift lead
+- notify responsible process or equipment engineer group when recurrence exists
+
+Critical
+- notify shift lead immediately
+- notify process engineer group
+- notify equipment engineer group when tool or chamber is implicated
+- notify quality or manufacturing control when cross-lot impact is possible
+
+Message requirements
+- include case identifier when available
+- include severity, suspected pattern, affected scope, and required next action
+- avoid causal certainty language when evidence is incomplete
+
+========================================================================
+AUDIT AND TRACEABILITY REQUIREMENTS
+========================================================================
+
+Every material action must record
+- timestamp
+- initiating agent or workflow
+- source evidence
+- severity and confidence
+- policy rule consulted
+- approvals requested or received
+- external tickets or workflow IDs
+
+Evidence retention
+- preserve wafer context summary
+- preserve diagnosis summary and alternatives considered
+- preserve notification payloads and recipients
+- preserve lot-hold request metadata
+
+Traceability rule
+Any response recommendation must be reproducible from stored evidence and policy references.
+
+========================================================================
+PROHIBITED AUTONOMOUS ACTIONS
+========================================================================
+
+Blocked actions
+- directly place a production lot on hold in MES
+- directly release a held lot
+- disable or reconfigure a production tool
+- modify recipes, limits, or control parameters
+- close compliance cases without human review
+- send external customer-facing communications
+
+Human-review triggers
+- critical severity
+- low-confidence case with high operational impact
+- cross-lot or cross-tool containment recommendation
+- policy exception or conflicting evidence
+
+Default rule
+If an action could interrupt production, alter manufacturing state, or create a release decision, require human approval.

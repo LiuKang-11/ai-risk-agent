@@ -1,0 +1,141 @@
+wafer_response_playbook
+
+Source package for the Wafer Response Planner.
+
+========================================================================
+README
+========================================================================
+
+Attach this knowledge source to the Wafer Response Planner.
+
+Purpose:
+- convert diagnosis and compliance outputs into an operator-ready action plan
+- route work to the right owner groups
+- sequence logging, notification, review, and containment steps
+
+This package should focus on next steps, not raw technical diagnosis or policy interpretation alone.
+
+========================================================================
+RESPONSE PLAYBOOKS
+========================================================================
+
+Normal playbook
+1. Record the event if it adds trend value.
+2. Keep the case in monitor state.
+3. Recommend more evidence only if recurrence risk is non-zero.
+
+Suspicious playbook
+1. Create case log.
+2. Summarize diagnosis evidence and uncertainty.
+3. Notify shift lead and responsible engineering group.
+4. Request metrology review if evidence is incomplete.
+5. Monitor recurrence on affected lot, tool, or chamber.
+
+Critical playbook
+1. Create case log immediately.
+2. Notify required owners with high priority.
+3. Ask Compliance Agent to validate candidate actions.
+4. Submit lot-hold request if policy threshold is met.
+5. Open engineering or equipment ticket.
+6. Launch tool inspection or follow-up workflow if tool involvement is likely.
+7. Record all actions in audit trail.
+
+========================================================================
+DEFECT TO ACTION MAPPING
+========================================================================
+
+Scratch
+- prioritize handling-path review
+- request tool or robot inspection
+- notify equipment engineering
+
+Edge-Ring or Edge-Loc
+- review edge hardware, edge process settings, and perimeter metrology
+- involve process engineering and equipment engineering when hardware evidence exists
+
+Donut or Center
+- request chamber, recipe, and radial metrology review
+- compare recent chamber history and similar cases
+
+Random
+- prioritize contamination assessment
+- compare recent lots and shared tool paths
+- consider metrology follow-up and containment review
+
+Near-full
+- treat as urgent containment candidate
+- notify broad owner set
+- submit lot-hold request when policy allows
+
+Loc
+- request localized process or hardware review
+- compare hotspot location recurrence
+
+None
+- log only if needed for trend tracking
+- do not overreact without corroborating evidence
+
+========================================================================
+OWNER ROUTING MATRIX
+========================================================================
+
+Shift lead
+- first operational owner for suspicious and critical cases
+
+Process engineer
+- radial non-uniformity, recipe drift, metrology excursions, and defect trends by process step
+
+Equipment engineer
+- tool alarms, chamber state changes, handling-path issues, scratch risk, hardware inspection
+
+Quality or manufacturing control
+- cross-lot impact, contamination containment, audit-sensitive decisions
+
+Metrology team
+- evidence collection, radial and edge measurements, confirmation or refutation of suspected defect impact
+
+Routing rule
+Route to all directly implicated groups for critical cases; avoid broad notification for low-confidence normal cases.
+
+========================================================================
+INCIDENT TEMPLATES
+========================================================================
+
+Case log template
+- title: wafer defect incident for wafer_id or lot_id
+- fields: severity, suspected defect, confidence, affected scope, evidence summary, requested next steps
+
+Engineering ticket template
+- title: suspected {defect_class} issue on tool {tool_id} at {process_step}
+- include: recurrence summary, alarms, lot impact, recommended inspection focus
+
+Notification template
+- severity: {severity}
+- summary: suspected {defect_class} on {tool_id} affecting {scope}
+- action needed: {requested_action}
+- case reference: {case_id}
+
+Lot-hold request template
+- lot: {lot_id}
+- reason: {containment_reason}
+- supporting evidence: {evidence_summary}
+- requested approver: {approval_role}
+
+========================================================================
+ESCALATION WORKFLOW
+========================================================================
+
+Standard sequence
+1. Gather context and diagnosis summary.
+2. Confirm severity and confidence.
+3. Ask Compliance Agent for allowed and restricted actions.
+4. Create case log before operational branching.
+5. Send required notifications.
+6. Submit hold request if needed and allowed.
+7. Open engineering ticket or tool inspection workflow.
+8. Record audit references and next review checkpoint.
+
+Special rules
+- if contamination is plausible, compress the sequence and prioritize containment requests
+- if diagnosis confidence is low, request metrology review before stronger actions when policy permits
+- if a tool is implicated across multiple lots, prioritize equipment inspection and broad owner routing
